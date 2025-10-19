@@ -55,9 +55,10 @@
 ```
 specs/[###-feature]/
 ├── plan.md              # This file (/plan command output)
-├── research.md          # Phase 0 output (/plan command)
-├── data-model.md        # Phase 1 output (/plan command)
-├── quickstart.md        # Phase 1 output (/plan command)
+├── research.md          # Phase 0 output (/plan command) [✔ Phase 0 Complete]
+├── data-model.md        # Phase 1 output (/plan command) [✔ Phase 1 Complete]
+├── quickstart.md        # Phase 1 output (/plan command) [✔ Phase 1 Complete]
+├── contracts/           # Phase 1 output (/plan command) [✔ Phase 1 Complete]
 ├── contracts/           # Phase 1 output (/plan command)
 └── tasks.md             # Phase 2 output (/tasks command - NOT created by /plan)
 ```
