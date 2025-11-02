@@ -1,24 +1,10 @@
 ## Clarifications
-- Q: For manual location entry (if location services are disabled), what format should users use? → A: Both city and zip allowed
-- Q: How should the app handle AdMob failures (ads not loading or displaying)? → A: Silently hide ad space and log error to notify admin for review
-- Q: How should the app detect and handle fraudulent ratings or deal validations? → A: Use automated AI-based fraud detection
-- Q: How should the app prevent multiple redemptions of the same deal by a user? → A: Allow multiple redemptions with time limit (e.g., once per day)
 ### Session 2025-10-05
 - Q: How should the app handle cases where location services are disabled for a user? → A: Prompt user to enable location for best experience
-# Feature Specification: [FEATURE NAME]
-
-**Feature Branch**: `[###-feature-name]`  
-**Created**: [DATE]  
-**Status**: Draft  
-**Input**: User description: "$ARGUMENTS"
-
-## Execution Flow (main)
-```
-1. Parse user description from Input
-   → If empty: ERROR "No feature description provided"
-2. Extract key concepts from description
-   → Identify: actors, actions, data, constraints
-
+- Q: For manual location entry (if location services are disabled), what format should users use? → A: Both city and zip allowed
+- Q: How should the app prevent multiple redemptions of the same deal by a user? → A: Allow multiple redemptions with time limit (e.g., once per day)
+- Q: How should the app detect and handle fraudulent ratings or deal validations? → A: Use automated AI-based fraud detection
+- Q: How should the app handle AdMob failures (ads not loading or displaying)? → A: Silently hide ad space and log error to notify admin for review
 
 # Feature Specification: NearbyPerks Mobile App
 
@@ -72,7 +58,7 @@ A user opens the app, sees a curated list of local deals based on their location
 
 ### Functional Requirements
 - **FR-012**: System MUST provide an admin portal for onboarding new merchants, accessible only to users with admin role. Admins MUST be able to log in, add/edit merchant details, and approve deals for display in the app.
-- System MUST allow manual location entry using both city and zip code if location services are disabled.
+- **FR-013**: System MUST allow manual location entry using both city and zip code if location services are disabled.
 - **FR-001**: System MUST allow users to discover deals based on their current location.
 - **FR-002**: System MUST provide AI-powered personalized deal recommendations.
 - **FR-003**: System MUST integrate Google AdMob for non-intrusive, locally targeted advertisements.
@@ -84,6 +70,13 @@ A user opens the app, sees a curated list of local deals based on their location
 - **FR-009**: System MUST prevent multiple redemptions of the same deal by enforcing a time limit (e.g., once per day).
 - **FR-010**: System MUST detect and handle fraudulent ratings/validations using automated AI-based fraud detection.
 - **FR-011**: System MUST gracefully handle AdMob failures by silently hiding ad space and logging errors to notify admin for review.
+
+### Non-Functional Requirements
+- **NFR-001 Uptime & Availability**: Service MUST achieve 99% monthly uptime. Error budget and incident response follow industry standard SRE practices (track SLOs/SLIs, consume error budget before feature rollout).
+- **NFR-002 Data Retention**: Personal and transactional data retention is 1 year unless legally required otherwise; implement deletion workflows for expired data and user-initiated requests.
+- **NFR-003 Performance**: App cold start <2s on target devices; API p95 latency <200ms; UI remains 60fps during typical interactions.
+- **NFR-004 Security & Privacy**: Secrets managed securely; data in transit (TLS 1.2+) and at rest encryption; RBAC enforced (admin, merchant, user); audit logs for admin actions.
+- **NFR-005 Observability**: Emit metrics for key flows (deals_fetched_count, redemption_success_rate, fraud_flag_rate, ad_fail_count), tracing enabled on API, alerting on SLO breaches.
 
 ### Key Entities
 - **User**: Represents an app user; attributes include location, preferences, redemption history, ratings, invitations sent/received.

@@ -1,0 +1,627 @@
+openapi: 3.0.3
+info:
+  title: NearbyPerks API
+  description: Backend API for NearbyPerks local deals and discounts mobile app
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development server
+
+paths:
+  # Authentication
+  /auth/login:
+    post:
+      summary: User login
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+              required: [email, password]
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid credentials
+
+  /auth/register:
+    post:
+      summary: User registration
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                location:
+                  $ref: '#/components/schemas/Location'
+              required: [name, email, password]
+      responses:
+        '201':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input
+
+  # Users
+  /users/profile:
+    get:
+      summary: Get user profile
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    put:
+      summary: Update user profile
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                location:
+                  $ref: '#/components/schemas/Location'
+                preferences:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  # Deals
+  /deals:
+    get:
+      summary: Get nearby deals
+      tags: [Deals]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: lat
+          in: query
+          schema:
+            type: number
+            format: float
+        - name: lng
+          in: query
+          schema:
+            type: number
+            format: float
+        - name: radius
+          in: query
+          schema:
+            type: integer
+            default: 5000
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of nearby deals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Deal'
+
+  /deals/{dealId}:
+    get:
+      summary: Get deal details
+      tags: [Deals]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: dealId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Deal details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deal'
+        '404':
+          description: Deal not found
+
+  /deals/recommendations:
+    get:
+      summary: Get personalized deal recommendations
+      tags: [Deals]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Personalized recommendations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Deal'
+
+  # Redemptions
+  /redemptions:
+    post:
+      summary: Redeem a deal
+      tags: [Redemptions]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dealId:
+                  type: string
+                  format: uuid
+                code:
+                  type: string
+                  description: QR/barcode value
+              required: [dealId, code]
+      responses:
+        '201':
+          description: Deal redeemed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Redemption'
+        '400':
+          description: Invalid redemption (expired, already used, etc.)
+        '404':
+          description: Deal not found
+
+    get:
+      summary: Get user redemption history
+      tags: [Redemptions]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Redemption history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Redemption'
+
+  # Ratings
+  /ratings:
+    post:
+      summary: Rate a deal
+      tags: [Ratings]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dealId:
+                  type: string
+                  format: uuid
+                score:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+                  maxLength: 500
+              required: [dealId, score]
+      responses:
+        '201':
+          description: Rating submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rating'
+        '400':
+          description: Invalid rating or already rated
+
+  # Merchants (Admin)
+  /admin/merchants:
+    get:
+      summary: Get all merchants (admin only)
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of merchants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Merchant'
+        '403':
+          description: Admin access required
+
+    post:
+      summary: Create new merchant (admin only)
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                contactInfo:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                    phone:
+                      type: string
+                address:
+                  $ref: '#/components/schemas/Address'
+              required: [name, contactInfo, address]
+      responses:
+        '201':
+          description: Merchant created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Merchant'
+        '403':
+          description: Admin access required
+
+  /admin/merchants/{merchantId}/approve:
+    put:
+      summary: Approve/reject merchant (admin only)
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: merchantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [active, rejected]
+              required: [status]
+      responses:
+        '200':
+          description: Merchant status updated
+        '403':
+          description: Admin access required
+
+  /admin/deals/{dealId}/approve:
+    put:
+      summary: Approve/reject deal (admin only)
+      tags: [Admin]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: dealId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                approved:
+                  type: boolean
+              required: [approved]
+      responses:
+        '200':
+          description: Deal approval status updated
+        '403':
+          description: Admin access required
+
+  # Invites
+  /invites:
+    post:
+      summary: Send app invitation
+      tags: [Invites]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                message:
+                  type: string
+                  maxLength: 200
+              required: [email]
+      responses:
+        '201':
+          description: Invitation sent
+        '429':
+          description: Rate limit exceeded
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [user, merchant, admin]
+        location:
+          $ref: '#/components/schemas/Location'
+        preferences:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    Location:
+      type: object
+      properties:
+        city:
+          type: string
+        zip:
+          type: string
+        coordinates:
+          type: object
+          properties:
+            lat:
+              type: number
+              format: float
+            lng:
+              type: number
+              format: float
+
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+        city:
+          type: string
+        zip:
+          type: string
+        coordinates:
+          type: object
+          properties:
+            lat:
+              type: number
+              format: float
+            lng:
+              type: number
+              format: float
+      required: [street, city, zip]
+
+    Merchant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        contactInfo:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+            phone:
+              type: string
+        address:
+          $ref: '#/components/schemas/Address'
+        status:
+          type: string
+          enum: [pending, active, rejected]
+        createdAt:
+          type: string
+          format: date-time
+
+    Deal:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        merchantId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        location:
+          $ref: '#/components/schemas/Address'
+        validity:
+          type: object
+          properties:
+            startDate:
+              type: string
+              format: date-time
+            endDate:
+              type: string
+              format: date-time
+        redemptionMethod:
+          type: string
+          enum: [qr, barcode]
+        rating:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 5
+        approved:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    Redemption:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        dealId:
+          type: string
+          format: uuid
+        code:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        validationStatus:
+          type: string
+          enum: [pending, validated, flagged]
+
+    Rating:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        dealId:
+          type: string
+          format: uuid
+        score:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        fraudFlag:
+          type: boolean
+          default: false
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        dealId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        message:
+          type: string
+        location:
+          $ref: '#/components/schemas/Location'
+        timeSent:
+          type: string
+          format: date-time

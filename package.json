@@ -1,0 +1,24 @@
+{
+  "name": "nearbyperks-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "NearbyPerks monorepo with contracts tests and Express API",
+  "scripts": {
+    "test": "jest",
+    "start": "node src/server.js"
+  },
+  "devDependencies": {
+    "jest": "29.7.0",
+    "supertest": "7.0.0"
+  },
+  "dependencies": {
+    "express": "4.19.2",
+    "uuid": "9.0.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/specs/001-local-deals-and/contracts/**/*.test.js"
+    ]
+  }
+}

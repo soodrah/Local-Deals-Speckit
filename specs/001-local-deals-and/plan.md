@@ -1,8 +1,8 @@
 
 # Implementation Plan: [FEATURE]
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
+**Branch**: `001-local-deals-and` | **Date**: 2025-10-19 | **Spec**: `/specs/001-local-deals-and/spec.md`
+**Input**: Feature specification from `/specs/001-local-deals-and/spec.md`
 
 ## Execution Flow (/plan command scope)
 ```
@@ -34,12 +34,12 @@
 [Extract from feature spec: primary requirement + technical approach from research]
 
 ## Technical Context
-**Language/Version**: JavaScript/TypeScript (React Native, Node.js), Python 3.11 (FastAPI)
-**Primary Dependencies**: React Native, Node.js/Express, FastAPI, PostgreSQL, Firebase, Google AdMob SDK, OpenAI API
+**Language/Version**: TypeScript (React Native), Node.js 20 (Express)
+**Primary Dependencies**: React Native, Node.js/Express, PostgreSQL, Firebase (optional), Google AdMob SDK, OpenAI API
 **Storage**: PostgreSQL (primary), Firebase (optional for real-time features)
 **Testing**: Jest (JS), Pytest (Python), Detox (E2E)
 **Target Platform**: iOS 15+, Android 10+, Web (admin portal)
-**Project Type**: mobile (React Native/Flutter), backend API (Node.js/FastAPI), web admin portal (React/Next.js)
+**Project Type**: mobile (React Native), backend API (Node.js/Express), web admin portal (Next.js)
 **Performance Goals**: App load <2s, API response <300ms, 60 fps UI
 **Constraints**: <200ms p95 API, <100MB memory per instance, offline-capable mobile app
 **Scale/Scope**: 10k+ users, 100+ merchants, 50+ screens/features
@@ -53,13 +53,12 @@
 
 ### Documentation (this feature)
 ```
-specs/[###-feature]/
+specs/001-local-deals-and/
 ├── plan.md              # This file (/plan command output)
 ├── research.md          # Phase 0 output (/plan command) [✔ Phase 0 Complete]
 ├── data-model.md        # Phase 1 output (/plan command) [✔ Phase 1 Complete]
 ├── quickstart.md        # Phase 1 output (/plan command) [✔ Phase 1 Complete]
 ├── contracts/           # Phase 1 output (/plan command) [✔ Phase 1 Complete]
-├── contracts/           # Phase 1 output (/plan command)
 └── tasks.md             # Phase 2 output (/tasks command - NOT created by /plan)
 ```
 
@@ -106,8 +105,7 @@ ios/ or android/
 └── [platform-specific structure: feature modules, UI flows, platform tests]
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Mobile + API + Admin portal. Tech: React Native app, Node.js/Express API, Next.js admin web. Artifacts under `specs/001-local-deals-and/` correspond to design; source code to be scaffolded under `apps/mobile`, `apps/api`, `apps/admin` in implementation.
 
 ## Phase 0: Outline & Research
 1. **Extract unknowns from Technical Context** above:
@@ -203,8 +201,8 @@ directories captured above]
 *This checklist is updated during execution flow*
 
 **Phase Status**:
-- [ ] Phase 0: Research complete (/plan command)
-- [ ] Phase 1: Design complete (/plan command)
+- [x] Phase 0: Research complete (/plan command)
+- [x] Phase 1: Design complete (/plan command)
 - [ ] Phase 2: Task planning complete (/plan command - describe approach only)
 - [ ] Phase 3: Tasks generated (/tasks command)
 - [ ] Phase 4: Implementation complete
@@ -213,8 +211,8 @@ directories captured above]
 **Gate Status**:
 - [ ] Initial Constitution Check: PASS
 - [ ] Post-Design Constitution Check: PASS
-- [ ] All NEEDS CLARIFICATION resolved
+- [x] All NEEDS CLARIFICATION resolved
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v2.1.1 - See `/memory/constitution.md`*
+*Based on Constitution v3.0.0 - See `.specify/memory/constitution.md`*

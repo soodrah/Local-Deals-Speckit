@@ -35,52 +35,59 @@
 ## Task List
 
 ### Setup
-- T001 [P] Initialize repository and set up monorepo structure (`/`)
-- T002 [P] Install dependencies for mobile (React Native/Flutter), backend (Node.js/Express or FastAPI), and admin portal (React/Next.js)
-- T003 [P] Configure PostgreSQL and Firebase (optional)
-- T004 [P] Set up environment variables for API keys (OpenAI, AdMob, etc.)
-- T005 [P] Run database migrations
-- T006 [P] Set up linting and formatting tools
+- T001 Initialize repository and set up monorepo structure (`/`)
+- T002 Install dependencies: React Native (mobile), Node.js/Express (API), Next.js (admin)
+- T003 Configure PostgreSQL and Firebase (optional)
+- T004 Set up environment variables for API keys (OpenAI, AdMob, etc.) with secure secret storage
+- T005 Set up linting, formatting, commit hooks; create CI pipeline (lint, tests, coverage >=80%)
+- T006 Define API contracts in OpenAPI for deals, merchants, redemptions, ratings, auth; scaffold files under `specs/001-local-deals-and/contracts/`
+- T007 Generate initial contract tests from OpenAPI (one per endpoint)
 
 ### Tests
-- T007 [P] Write contract/API tests for each endpoint in `contracts/`
-- T008 [P] Write integration tests for user stories (location-based deals, redemption, rating, admin onboarding)
-- T009 [P] Write unit tests for models and services
-- T010 [P] Write end-to-end tests for mobile app (Detox)
+- T008 Write integration tests for user stories (location-based deals, redemption, rating, admin onboarding)
+- T009 Write unit tests for models and services
+- T010 Write end-to-end tests for mobile app (Detox)
+- T011 Add negative tests: expired deals, duplicate redemption attempt, invalid rating, AdMob failure path
 
 ### Core
-- T011 [P] Implement User model and authentication logic (`data-model.md`)
-- T012 [P] Implement Merchant model and onboarding logic
-- T013 [P] Implement Deal model and approval workflow
-- T014 [P] Implement Redemption model and QR/barcode logic
-- T015 [P] Implement Notification model and geo-fenced logic
-- T016 [P] Implement Ad model and AdMob integration
-- T017 [P] Implement Rating model and AI-based fraud detection
+- T012 Implement User model and authentication logic (`data-model.md`)
+- T013 Implement Merchant model and onboarding logic (with audit log fields)
+- T014 Implement Deal model and approval workflow (approved status, validity, limits)
+- T015 Implement Redemption model and QR/barcode logic (enforce time window)
+- T016 Implement Notification model and geo-fenced logic (permission handling)
+- T017 Implement Ad model and AdMob integration (failure hooks)
+- T018 Implement Rating model and AI-based fraud detection (flag + review queue)
+- T019 Implement Recommendation service abstraction with provider (OpenAI) behind interface
+- T020 Implement Invite/Share service with deep links
 
 ### Integration
-- T018 [P] Integrate backend API with PostgreSQL
-- T019 [P] Integrate mobile app with backend API
-- T020 [P] Integrate admin portal with backend API
-- T021 [P] Integrate AdMob SDK in mobile app
-- T022 [P] Integrate OpenAI API for recommendations
-- T023 [P] Implement role-based access control (admin, merchant, user)
-- T024 [P] Implement logging and error tracking
+- T021 Integrate backend API with PostgreSQL (migrations, connection pooling)
+- T022 Integrate mobile app with backend API (typed client)
+- T023 Integrate admin portal with backend API
+- T024 Integrate AdMob SDK in mobile app
+- T025 Integrate OpenAI API for recommendations
+- T026 Implement role-based access control (admin, merchant, user) and route guards
+- T027 Implement logging, metrics (deals_fetched_count, redemption_success_rate, fraud_flag_rate, ad_fail_count), tracing, and alerting
+- T028 Implement rate limiting for redemption and invites; add cache for discovery
+- T029 Implement data retention (1-year) and deletion workflows; backup/restore runbook
 
 ### Polish
-- T025 [P] Optimize app performance (load time, API response, UI fps)
-- T026 [P] Ensure accessibility compliance (WCAG 2.1 AA, mobile standards)
-- T027 [P] Write and update documentation (README.md, onboarding guides)
-- T028 [P] Prepare release notes and update CHANGELOG.md
+- T030 Optimize app performance (load time, API response, UI fps); add performance tests and budgets
+- T031 Ensure accessibility compliance (WCAG 2.1 AA on web; mobile a11y labels and tests)
+- T032 Write and update documentation (README.md, API reference from OpenAPI, onboarding guides)
+- T033 Define SLA doc (99% uptime) and incident response runbook; set SLO dashboards
+- T034 Prepare release notes and update CHANGELOG.md; set up semantic-release/versioning
 
 ## Parallel Execution Examples
-- T001–T006 (Setup) can run in parallel
-- T007–T010 (Tests) can run in parallel
-- T011–T017 (Core models/services) can run in parallel
-- T018–T024 (Integration) can run in parallel
-- T025–T028 (Polish) can run in parallel
+- Setup: T001–T005 can run in parallel; T006 → T007 sequential
+- Tests: T008–T011 can run in parallel
+- Core: T012–T020 can run in parallel where data model boundaries allow
+- Integration: T021–T029 mostly sequential (DB, RBAC before rate limiting; logging before alerting)
+- Polish: T030–T034 can run in parallel after Integration
 
 ## Dependency Notes
 - Setup tasks must be completed before core, integration, and polish tasks
+- Contracts and contract tests (T006–T007) precede endpoint implementation
 - Tests should be written before implementation (TDD)
 - Models must be implemented before services and endpoints
 - Integration tasks depend on core models/services
